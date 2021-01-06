@@ -12,6 +12,7 @@ from mineralogist import *
 from transrate import *
 from transratework import *
 from PIL import Image, ImageTk
+from examination import jp_to_romen
 
 """ グローバル変数の定義
 """
@@ -102,12 +103,25 @@ def talk():
             # 入力エリアをクリア
             entry.delete(0, tk.END)
     elif question ==1:
-        response = is_weather(value)
-        response_area.configure(text=value + 'の天気は、\n'
-                             + response + 'です。')
-        question = 0
-        # 入力エリアをクリア
-        entry.delete(0, tk.END)
+        try:
+            response = is_weather(value)
+            response_area.configure(text=value + 'の天気は、\n'
+                                 + response + 'です。')
+            question = 0
+            # 入力エリアをクリア
+            entry.delete(0, tk.END)
+        except is_weather.exception.KeyError:
+            words = jp_to_romen(value)
+            response = is_weather(words)
+            response_area.configure(text=value + 'の天気は、\n'
+                                + response + 'です。')
+            question = 0
+            # 入力エリアをクリア
+            entry.delete(0, tk.END)
+        except:
+            response_area.configure(text='該当する地名がありません。')
+            question = 0
+            entry.delete(0, tk.END)
     elif value == 'ウィキ':
         if question == 0:
             response_area.configure(text='何を調べますか？')
@@ -454,7 +468,7 @@ def talk():
         else:
             image_files = 'picture/' + value + '.jpg'
             try:
-                response_area.configure(text='指定された画像を私の右側に表示しました。全画面表示にしてご確認ください。\n\n'
+                response_area.configure(text='指定された画像を私の右側に表示しました。\n\n'
                                              '終了する場合は終了。と入力し話しかけてください。')
                 img = Image.open(image_files)
                 img = ImageTk.PhotoImage(img)
@@ -528,7 +542,7 @@ def run():
     # メインウィンドウを作成
     root = tk.Tk()
     # ウィンドウのサイズを設定
-    root.geometry('880x560')
+    root.geometry('1388x565')
     # ウィンドウのタイトルを設定
     root.title('Intelligent Agent : ')
     # フォントの用意
